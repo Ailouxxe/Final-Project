@@ -204,154 +204,186 @@ export default function AdminDashboard() {
             </div>
 
             {/* Active elections */}
-            <div className="mt-8">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-2xl font-bold text-gray-800">Active Elections</h2>
-                <Link href="/admin/elections" className="text-blue-600 hover:text-blue-800">
-                  View all
+            <div className="mt-12">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-800 flex items-center">
+                  <span className="bg-green-100 p-2 rounded-lg mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-green-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+                    </svg>
+                  </span>
+                  Active Elections
+                </h2>
+                <Link href="/admin/elections" className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all shadow-md flex items-center">
+                  <span>View all</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
                 </Link>
               </div>
               {activeElections.length === 0 ? (
-                <div className="bg-white p-6 rounded-lg shadow-md text-center">
-                  <p className="text-gray-500">No active elections at the moment.</p>
+                <div className="bg-white p-8 rounded-xl shadow-md text-center border border-gray-100">
+                  <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <p className="text-gray-600 font-medium">No active elections at the moment.</p>
+                  <p className="text-gray-500 text-sm mt-1">Create a new election to get started.</p>
                 </div>
               ) : (
-                <div className="bg-white shadow overflow-hidden sm:rounded-md">
-                  <ul className="divide-y divide-gray-200">
-                    {activeElections.map((election) => (
-                      <li key={election.id}>
-                        <Link href={`/admin/elections/${election.id}`} className="block hover:bg-gray-50">
-                          <div className="px-4 py-4 sm:px-6">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center">
-                                <div className="ml-3">
-                                  <p className="text-lg font-medium text-blue-600 truncate">{election.title}</p>
-                                  <p className="mt-1 text-sm text-gray-500 truncate">{election.description}</p>
-                                </div>
-                              </div>
-                              <div className="ml-2 flex-shrink-0 flex">
-                                <p className="inline-flex px-2 text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                  Active
-                                </p>
-                              </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {activeElections.map((election) => (
+                    <Link key={election.id} href={`/admin/elections/${election.id}`}>
+                      <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-100 h-full">
+                        <div className="h-2 bg-green-500"></div>
+                        <div className="p-6">
+                          <div className="flex justify-between items-start">
+                            <h3 className="text-xl font-semibold text-gray-800 mb-2">{election.title}</h3>
+                            <span className="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 flex items-center">
+                              <span className="w-2 h-2 bg-green-500 rounded-full mr-1"></span>
+                              Active
+                            </span>
+                          </div>
+                          <p className="text-gray-600 mb-4 line-clamp-2">{election.description}</p>
+                          <div className="flex justify-between text-sm text-gray-500 pt-3 border-t border-gray-100">
+                            <div>
+                              <span className="font-medium text-gray-600">Started:</span> {formatDate(election.startDate)}
                             </div>
-                            <div className="mt-2 sm:flex sm:justify-between">
-                              <div className="sm:flex">
-                                <p className="flex items-center text-sm text-gray-500">
-                                  <span>Started {formatDate(election.startDate)}</span>
-                                </p>
-                              </div>
-                              <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
-                                <span>Ends {formatDate(election.endDate)}</span>
-                              </div>
+                            <div>
+                              <span className="font-medium text-gray-600">Ends:</span> {formatDate(election.endDate)}
                             </div>
                           </div>
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
                 </div>
               )}
             </div>
 
             {/* Upcoming elections */}
-            <div className="mt-8">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-2xl font-bold text-gray-800">Upcoming Elections</h2>
+            <div className="mt-12">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-800 flex items-center">
+                  <span className="bg-yellow-100 p-2 rounded-lg mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-yellow-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </span>
+                  Upcoming Elections
+                </h2>
               </div>
               {upcomingElections.length === 0 ? (
-                <div className="bg-white p-6 rounded-lg shadow-md text-center">
-                  <p className="text-gray-500">No upcoming elections scheduled.</p>
+                <div className="bg-white p-8 rounded-xl shadow-md text-center border border-gray-100">
+                  <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <p className="text-gray-600 font-medium">No upcoming elections scheduled.</p>
+                  <p className="text-gray-500 text-sm mt-1">Plan your next election in advance.</p>
                 </div>
               ) : (
-                <div className="bg-white shadow overflow-hidden sm:rounded-md">
-                  <ul className="divide-y divide-gray-200">
-                    {upcomingElections.map((election) => (
-                      <li key={election.id}>
-                        <Link href={`/admin/elections/${election.id}`} className="block hover:bg-gray-50">
-                          <div className="px-4 py-4 sm:px-6">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center">
-                                <div className="ml-3">
-                                  <p className="text-lg font-medium text-gray-900 truncate">{election.title}</p>
-                                  <p className="mt-1 text-sm text-gray-500 truncate">{election.description}</p>
-                                </div>
-                              </div>
-                              <div className="ml-2 flex-shrink-0 flex">
-                                <p className="inline-flex px-2 text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                  Upcoming
-                                </p>
-                              </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {upcomingElections.map((election) => (
+                    <Link key={election.id} href={`/admin/elections/${election.id}`}>
+                      <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-100 h-full">
+                        <div className="h-2 bg-yellow-500"></div>
+                        <div className="p-6">
+                          <div className="flex justify-between items-start">
+                            <h3 className="text-xl font-semibold text-gray-800 mb-2">{election.title}</h3>
+                            <span className="px-3 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800 flex items-center">
+                              <span className="w-2 h-2 bg-yellow-500 rounded-full mr-1"></span>
+                              Upcoming
+                            </span>
+                          </div>
+                          <p className="text-gray-600 mb-4 line-clamp-2">{election.description}</p>
+                          <div className="flex justify-between text-sm text-gray-500 pt-3 border-t border-gray-100">
+                            <div>
+                              <span className="font-medium text-gray-600">Starts:</span> {formatDate(election.startDate)}
                             </div>
-                            <div className="mt-2 sm:flex sm:justify-between">
-                              <div className="sm:flex">
-                                <p className="flex items-center text-sm text-gray-500">
-                                  <span>Starts {formatDate(election.startDate)}</span>
-                                </p>
-                              </div>
-                              <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
-                                <span>Ends {formatDate(election.endDate)}</span>
-                              </div>
+                            <div>
+                              <span className="font-medium text-gray-600">Ends:</span> {formatDate(election.endDate)}
                             </div>
                           </div>
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
                 </div>
               )}
             </div>
 
             {/* Past elections */}
-            <div className="mt-8">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-2xl font-bold text-gray-800">Past Elections</h2>
+            <div className="mt-12">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-800 flex items-center">
+                  <span className="bg-gray-100 p-2 rounded-lg mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                  </span>
+                  Past Elections
+                </h2>
               </div>
               {pastElections.length === 0 ? (
-                <div className="bg-white p-6 rounded-lg shadow-md text-center">
-                  <p className="text-gray-500">No past elections found.</p>
+                <div className="bg-white p-8 rounded-xl shadow-md text-center border border-gray-100">
+                  <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                    </svg>
+                  </div>
+                  <p className="text-gray-600 font-medium">No past elections found.</p>
+                  <p className="text-gray-500 text-sm mt-1">Completed elections will appear here.</p>
                 </div>
               ) : (
-                <div className="bg-white shadow overflow-hidden sm:rounded-md">
-                  <ul className="divide-y divide-gray-200">
-                    {pastElections.map((election) => (
-                      <li key={election.id}>
-                        <Link href={`/admin/results?electionId=${election.id}`} className="block hover:bg-gray-50">
-                          <div className="px-4 py-4 sm:px-6">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center">
-                                <div className="ml-3">
-                                  <p className="text-lg font-medium text-gray-900 truncate">{election.title}</p>
-                                  <p className="mt-1 text-sm text-gray-500 truncate">{election.description}</p>
-                                </div>
-                              </div>
-                              <div className="ml-2 flex-shrink-0 flex">
-                                <p className="inline-flex px-2 text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-                                  Completed
-                                </p>
-                              </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {pastElections.map((election) => (
+                    <Link key={election.id} href={`/admin/results?electionId=${election.id}`}>
+                      <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-100 h-full">
+                        <div className="h-2 bg-gray-500"></div>
+                        <div className="p-6">
+                          <div className="flex justify-between items-start">
+                            <h3 className="text-xl font-semibold text-gray-800 mb-2">{election.title}</h3>
+                            <span className="px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800 flex items-center">
+                              <span className="w-2 h-2 bg-gray-500 rounded-full mr-1"></span>
+                              Completed
+                            </span>
+                          </div>
+                          <p className="text-gray-600 mb-4 line-clamp-2">{election.description}</p>
+                          <div className="flex justify-between text-sm text-gray-500 pt-3 border-t border-gray-100">
+                            <div>
+                              <span className="font-medium text-gray-600">Ended:</span> {formatDate(election.endDate)}
                             </div>
-                            <div className="mt-2 sm:flex sm:justify-between">
-                              <div className="flex items-center text-sm text-gray-500">
-                                <span>Ended {formatDate(election.endDate)}</span>
-                              </div>
-                              <div className="mt-2 flex items-center text-sm text-blue-600 sm:mt-0">
-                                View Results →
-                              </div>
+                            <div className="text-blue-600 font-medium flex items-center">
+                              View Results 
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                              </svg>
                             </div>
                           </div>
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
                 </div>
               )}
             </div>
 
             {/* Voter feed */}
-            <div className="mt-8">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">Real-Time Voter Feed</h2>
-              <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="mt-12">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-800 flex items-center">
+                  <span className="bg-blue-100 p-2 rounded-lg mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                  </span>
+                  Real-Time Voter Feed
+                </h2>
+              </div>
+              <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
                 <VoterFeed limit={10} />
               </div>
             </div>
