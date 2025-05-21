@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  swcMinify: true,
   images: {
     domains: ['pixabay.com'],
   },
@@ -17,12 +16,6 @@ const nextConfig = {
   compiler: {
     // Remove console logs in production
     removeConsole: process.env.NODE_ENV === 'production',
-  },
-  experimental: {
-    // Enable server components
-    serverComponents: true,
-    // Enable concurrent features
-    concurrentFeatures: true,
   },
   serverRuntimeConfig: {
     // Will only be available on the server side

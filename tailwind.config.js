@@ -12,7 +12,7 @@ module.exports = {
     'bg-gray-100', 'text-gray-800',
     'bg-red-100', 'text-red-800',
     'bg-blue-100', 'text-blue-800',
-    'bg-green-500', 'bg-yellow-500', 'bg-gray-500', 'bg-red-500',
+    'bg-green-500', 'bg-yellow-500', 'bg-gray-500', 'bg-red-500', 'bg-blue-500',
     'text-green-600', 'text-yellow-600', 'text-gray-600', 'text-blue-600',
   ],
   theme: {
