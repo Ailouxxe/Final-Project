@@ -29,54 +29,57 @@ export default function AdminDashboard() {
       
       try {
         setLoading(true);
-        const now = new Date().toISOString();
         
-        // Fetch active elections
-        const activeElectionsQuery = query(
-          collection(db, 'elections'),
-          where('startDate', '<=', now),
-          where('endDate', '>=', now),
-          orderBy('startDate', 'desc'),
-          limit(5)
+        // Simpler approach to avoid composite index requirements
+        const allElectionsQuery = query(
+          collection(db, 'elections')
         );
         
-        // Fetch upcoming elections
-        const upcomingElectionsQuery = query(
-          collection(db, 'elections'),
-          where('startDate', '>', now),
-          orderBy('startDate', 'asc'),
-          limit(5)
-        );
-        
-        // Fetch past elections
-        const pastElectionsQuery = query(
-          collection(db, 'elections'),
-          where('endDate', '<', now),
-          orderBy('endDate', 'desc'),
-          limit(5)
-        );
-        
-        // Execute all queries in parallel
         const [
-          activeElectionsSnapshot,
-          upcomingElectionsSnapshot,
-          pastElectionsSnapshot,
+          allElectionsSnapshot,
           candidatesSnapshot,
-          votesSnapshot,
-          allElectionsSnapshot
+          votesSnapshot
         ] = await Promise.all([
-          getDocs(activeElectionsQuery),
-          getDocs(upcomingElectionsQuery),
-          getDocs(pastElectionsQuery),
+          getDocs(allElectionsQuery),
           getDocs(collection(db, 'candidates')),
-          getDocs(collection(db, 'votes')),
-          getDocs(collection(db, 'elections'))
+          getDocs(collection(db, 'votes'))
         ]);
         
+        // Get all elections
+        const allElections = allElectionsSnapshot.docs.map(doc => ({ 
+          id: doc.id, 
+          ...doc.data() 
+        }));
+        
+        // Filter elections based on dates
+        const now = new Date();
+        
         // Process results
-        setActiveElections(activeElectionsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-        setUpcomingElections(upcomingElectionsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-        setPastElections(pastElectionsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+        const active = [];
+        const upcoming = [];
+        const past = [];
+        
+        allElections.forEach(election => {
+          const startDate = new Date(election.startDate);
+          const endDate = new Date(election.endDate);
+          
+          if (startDate <= now && endDate >= now) {
+            active.push(election);
+          } else if (startDate > now) {
+            upcoming.push(election);
+          } else if (endDate < now) {
+            past.push(election);
+          }
+        });
+        
+        // Sort the filtered elections
+        active.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+        upcoming.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+        past.sort((a, b) => new Date(b.endDate) - new Date(a.endDate));
+        
+        setActiveElections(active.slice(0, 5));
+        setUpcomingElections(upcoming.slice(0, 5));
+        setPastElections(past.slice(0, 5));
         
         // Set stats
         setStats({
@@ -153,28 +156,49 @@ export default function AdminDashboard() {
 
             {/* Stats cards */}
             <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-3">
-              <div className="bg-white overflow-hidden shadow rounded-lg">
-                <div className="px-4 py-5 sm:p-6">
-                  <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">Total Elections</dt>
-                    <dd className="mt-1 text-3xl font-semibold text-gray-900">{stats.totalElections}</dd>
-                  </dl>
+              <div className="bg-gradient-to-r from-blue-500 to-blue-700 overflow-hidden shadow-lg rounded-xl text-white">
+                <div className="px-6 py-8">
+                  <div className="flex items-center justify-between">
+                    <dl>
+                      <dt className="text-sm font-medium text-blue-100 truncate">Total Elections</dt>
+                      <dd className="mt-2 text-4xl font-bold">{stats.totalElections}</dd>
+                    </dl>
+                    <div className="bg-blue-400 bg-opacity-30 p-3 rounded-lg">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                      </svg>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="bg-white overflow-hidden shadow rounded-lg">
-                <div className="px-4 py-5 sm:p-6">
-                  <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">Total Candidates</dt>
-                    <dd className="mt-1 text-3xl font-semibold text-gray-900">{stats.totalCandidates}</dd>
-                  </dl>
+              <div className="bg-gradient-to-r from-purple-500 to-purple-700 overflow-hidden shadow-lg rounded-xl text-white">
+                <div className="px-6 py-8">
+                  <div className="flex items-center justify-between">
+                    <dl>
+                      <dt className="text-sm font-medium text-purple-100 truncate">Total Candidates</dt>
+                      <dd className="mt-2 text-4xl font-bold">{stats.totalCandidates}</dd>
+                    </dl>
+                    <div className="bg-purple-400 bg-opacity-30 p-3 rounded-lg">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                      </svg>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="bg-white overflow-hidden shadow rounded-lg">
-                <div className="px-4 py-5 sm:p-6">
-                  <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">Total Votes Cast</dt>
-                    <dd className="mt-1 text-3xl font-semibold text-gray-900">{stats.totalVotes}</dd>
-                  </dl>
+              <div className="bg-gradient-to-r from-green-500 to-green-700 overflow-hidden shadow-lg rounded-xl text-white">
+                <div className="px-6 py-8">
+                  <div className="flex items-center justify-between">
+                    <dl>
+                      <dt className="text-sm font-medium text-green-100 truncate">Total Votes Cast</dt>
+                      <dd className="mt-2 text-4xl font-bold">{stats.totalVotes}</dd>
+                    </dl>
+                    <div className="bg-green-400 bg-opacity-30 p-3 rounded-lg">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
