@@ -37,13 +37,33 @@ module.exports = {
       boxShadow: {
         card: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
       },
+      backgroundImage: {
+        'green-gradient': 'linear-gradient(147deg, #164211, #329427, #164211)',
+      },
       animation: {
+        'gradient-flow': 'gradientFlow 5s ease infinite',
         'fade-in': 'fadeIn 0.5s ease-out',
+        'spin-and-rise': 'spinAndRise 6s linear infinite',
       },
       keyframes: {
         fadeIn: {
           '0%': { opacity: 0 },
           '100%': { opacity: 1 },
+        },
+        gradientFlow: {
+          '0%': { backgroundPosition: '0% 50%' },
+          '50%': { backgroundPosition: '100% 50%' },
+          '100%': { backgroundPosition: '0% 50%' },
+        },
+        spinAndRise: {
+          '0%': {
+            transform: 'translateY(0) rotate(0deg)',
+            opacity: '1',
+          },
+          '100%': {
+            transform: 'translateY(-500px) rotate(720deg)',
+            opacity: '0',
+          },
         },
       },
     },

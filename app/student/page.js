@@ -2,11 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { useAuth } from '../../context/AuthContext';
 import ProtectedRoute from '../../components/ProtectedRoute';
-import ElectionCard from '../../components/ElectionCard';
 import VoterFeed from '../../components/VoterFeed';
 
 export default function StudentDashboard() {
@@ -19,29 +18,21 @@ export default function StudentDashboard() {
   useEffect(() => {
     const fetchActiveElections = async () => {
       if (!user) return;
-      
+
       try {
         setLoading(true);
-        
-        // Simple approach to avoid composite index requirements
-        const allElectionsQuery = query(
-          collection(db, 'elections')
-        );
-        
+        const allElectionsQuery = query(collection(db, 'elections'));
         const querySnapshot = await getDocs(allElectionsQuery);
         const now = new Date();
         const electionsData = [];
-        
-        // Filter for active elections manually
+
         for (const doc of querySnapshot.docs) {
           const data = doc.data();
           const startDate = new Date(data.startDate);
           const endDate = new Date(data.endDate);
-          
+
           if (startDate <= now && endDate >= now) {
             const electionData = { id: doc.id, ...data };
-            
-            // Check if the student has already voted in this election
             const votesQuery = query(
               collection(db, 'votes'),
               where('electionId', '==', doc.id),
@@ -49,14 +40,11 @@ export default function StudentDashboard() {
             );
             const votesSnapshot = await getDocs(votesQuery);
             electionData.hasVoted = !votesSnapshot.empty;
-            
             electionsData.push(electionData);
           }
         }
-        
-        // Sort elections by start date, newest first
+
         electionsData.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
-        
         setElections(electionsData);
       } catch (err) {
         console.error('Error fetching elections:', err);
@@ -71,22 +59,51 @@ export default function StudentDashboard() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-          <div className="px-4 py-6 sm:px-0">
-            {/* Header with student welcome */}
-            <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl shadow-lg mb-8 p-8 text-white">
-              <h1 className="text-3xl font-bold mb-2">Student Dashboard</h1>
-              <p className="text-blue-100">Welcome back, {user?.displayName || 'Student'}!</p>
-              <div className="mt-4 flex items-center text-sm text-blue-100">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span>Cast your vote in active elections below</span>
-              </div>
-            </div>
-            
-            {/* Active elections section */}
+      <div
+        className="relative min-h-screen bg-cover bg-center"
+       style={{ backgroundImage: "url('/uploads/background1.png')" }}
+      >
+
+{/* Foreground content */}
+<div className="relative z-10 max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+  <div className="px-4 py-6 sm:px-0">
+    <div
+      className="relative bg-cover bg-center rounded-xl shadow-lg mb-8 p-8 text-white"
+      style={{ backgroundImage: "url('/uploads/background8.png')" }}
+    >
+      {/* Overlay - lighter */}
+      <div className="absolute inset-0 bg-black/30 rounded-xl"></div>
+
+      {/* Foreground text */}
+      <div className="relative z-10">
+        <h1 className="text-3xl font-bold mb-2">Student Dashboard</h1>
+        <p className="text-gray-200">
+          Welcome back, {user?.displayName || 'Student'}!
+        </p>
+        <div className="mt-4 flex items-center text-sm text-gray-200">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5 mr-2"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <span>Cast your vote in active elections below</span>
+        </div>
+      </div>
+    </div>
+
+
+
+
+            {/* Active Elections */}
             <div className="mb-10">
               <div className="flex items-center mb-6">
                 <span className="bg-green-100 p-2 rounded-lg mr-3">
@@ -94,9 +111,10 @@ export default function StudentDashboard() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </span>
-                <h2 className="text-2xl font-bold text-gray-800">Active Elections</h2>
+        <h2 className="text-2xl font-bold text-gray-600">Active Elections</h2>
+
               </div>
-              
+
               {loading ? (
                 <div className="flex justify-center items-center h-40 bg-white rounded-xl shadow-md p-8">
                   <div className="flex flex-col items-center">
@@ -131,14 +149,17 @@ export default function StudentDashboard() {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {elections.map((election) => (
-                    <div key={election.id} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-100 cursor-pointer h-full"
+                    <div
+                      key={election.id}
+                      className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-100 cursor-pointer h-full"
                       onClick={() => {
                         if (election.hasVoted) {
                           router.push(`/admin/results?electionId=${election.id}`);
                         } else {
                           router.push(`/student/vote/${election.id}`);
                         }
-                      }}>
+                      }}
+                    >
                       <div className={`h-2 ${election.hasVoted ? 'bg-purple-500' : 'bg-green-500'}`}></div>
                       <div className="p-6">
                         <div className="flex justify-between items-start">
@@ -174,8 +195,8 @@ export default function StudentDashboard() {
                 </div>
               )}
             </div>
-            
-            {/* Voter feed */}
+
+            {/* Voter Feed */}
             <div className="mt-12">
               <div className="flex items-center mb-6">
                 <span className="bg-blue-100 p-2 rounded-lg mr-3">
@@ -183,7 +204,7 @@ export default function StudentDashboard() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                 </span>
-                <h2 className="text-2xl font-bold text-gray-800">Real-Time Voter Feed</h2>
+                <h2 className="text-2xl font-bold text-gray-600">Real-Time Voter Feed</h2>
               </div>
               <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100 mb-6">
                 <VoterFeed limit={10} />

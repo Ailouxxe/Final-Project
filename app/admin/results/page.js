@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
@@ -10,7 +10,7 @@ import ResultsChart from '../../../components/ResultsChart';
 import VoterFeed from '../../../components/VoterFeed';
 import Link from 'next/link';
 
-export default function ElectionResults() {
+function ResultsPageContent() {
   const [election, setElection] = useState(null);
   const [elections, setElections] = useState([]);
   const [candidates, setCandidates] = useState([]);
@@ -331,5 +331,13 @@ export default function ElectionResults() {
         </div>
       </div>
     </AdminRoute>
+  );
+}
+
+export default function ResultsPage() {
+  return (
+    <Suspense fallback={<div>Loading results...</div>}>
+      <ResultsPageContent />
+    </Suspense>
   );
 }
