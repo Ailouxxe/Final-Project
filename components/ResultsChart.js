@@ -193,8 +193,8 @@ export default function ResultsChart({ electionId }) {
 
   return (
     <div>
-      <div className="mb-6">
-        <canvas ref={chartRef} height="300"></canvas>
+      <div className="mb-6 max-w-3xl mx-auto h-64 md:h-80">
+        <canvas ref={chartRef} height="100%"></canvas>
       </div>
       
       <div className="overflow-x-auto">

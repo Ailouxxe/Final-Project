@@ -1158,6 +1158,12 @@ select {
 .inset-0 {
   inset: 0px;
 }
+.right-1 {
+  right: 0.25rem;
+}
+.top-1 {
+  top: 0.25rem;
+}
 .z-10 {
   z-index: 10;
 }
@@ -1310,6 +1316,18 @@ select {
 .h-8 {
   height: 2rem;
 }
+.h-64 {
+  height: 16rem;
+}
+.h-24 {
+  height: 6rem;
+}
+.h-32 {
+  height: 8rem;
+}
+.h-48 {
+  height: 12rem;
+}
 .min-h-screen {
   min-height: 100vh;
 }
@@ -1342,6 +1360,12 @@ select {
 }
 .w-2 {
   width: 0.5rem;
+}
+.w-32 {
+  width: 8rem;
+}
+.w-16 {
+  width: 4rem;
 }
 .min-w-0 {
   min-width: 0px;
@@ -1539,6 +1563,9 @@ select {
 }
 .border-t {
   border-top-width: 1px;
+}
+.border-dashed {
+  border-style: dashed;
 }
 .border-blue-600 {
   --tw-border-opacity: 1;
@@ -1738,6 +1765,13 @@ select {
   --tw-gradient-to-position:  ;
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 }
+.from-blue-100 {
+  --tw-gradient-from: #dbeafe var(--tw-gradient-from-position);
+  --tw-gradient-from-position:  ;
+  --tw-gradient-to: rgb(219 234 254 / 0)  var(--tw-gradient-from-position);
+  --tw-gradient-to-position:  ;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
 .to-blue-700 {
   --tw-gradient-to: #1d4ed8 var(--tw-gradient-to-position);
   --tw-gradient-to-position:  ;
@@ -1756,6 +1790,10 @@ select {
 }
 .to-blue-800 {
   --tw-gradient-to: #1e40af var(--tw-gradient-to-position);
+  --tw-gradient-to-position:  ;
+}
+.to-blue-200 {
+  --tw-gradient-to: #bfdbfe var(--tw-gradient-to-position);
   --tw-gradient-to-position:  ;
 }
 .object-cover {
@@ -1779,6 +1817,9 @@ select {
 }
 .p-5 {
   padding: 1.25rem;
+}
+.p-1 {
+  padding: 0.25rem;
 }
 .px-2 {
   padding-left: 0.5rem;
@@ -2314,6 +2355,11 @@ body {
   background-color: rgb(255 255 255 / 0.1);
 }
 
+.hover\:bg-red-600:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(220 38 38 / var(--tw-bg-opacity));
+}
+
 .hover\:text-blue-500:hover {
   --tw-text-opacity: 1;
   color: rgb(59 130 246 / var(--tw-text-opacity));
@@ -2504,6 +2550,10 @@ body {
 
   .md\:hidden {
     display: none;
+  }
+
+  .md\:h-80 {
+    height: 20rem;
   }
 
   .md\:w-1\/3 {

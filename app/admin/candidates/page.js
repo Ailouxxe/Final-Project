@@ -236,11 +236,26 @@ export default function ManageCandidates() {
                           </div>
                         )}
                         <div className="px-4 py-4 sm:px-6">
-                          <div className="flex justify-between">
-                            <div>
-                              <h3 className="text-lg font-medium text-blue-600 truncate">{candidate.fullName}</h3>
-                              <p className="mt-1 text-sm text-gray-500">Department: {candidate.department}</p>
-                              <p className="mt-1 text-sm text-gray-500 truncate">Election: {elections[candidate.electionId]?.title || 'Unknown'}</p>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center">
+                              <div className="flex-shrink-0 h-16 w-16 mr-4 rounded-full overflow-hidden border border-gray-200 shadow-sm">
+                                {candidate.mainImageUrl ? (
+                                  <img 
+                                    src={candidate.mainImageUrl} 
+                                    alt={candidate.fullName}
+                                    className="h-full w-full object-cover"
+                                  />
+                                ) : (
+                                  <div className="h-full w-full bg-gradient-to-r from-blue-100 to-blue-200 flex items-center justify-center">
+                                    <span className="text-blue-700 font-bold text-xl">{candidate.fullName.charAt(0)}</span>
+                                  </div>
+                                )}
+                              </div>
+                              <div>
+                                <h3 className="text-lg font-medium text-blue-600 truncate">{candidate.fullName}</h3>
+                                <p className="mt-1 text-sm text-gray-500">Department: {candidate.department}</p>
+                                <p className="mt-1 text-sm text-gray-500 truncate">Election: {elections[candidate.electionId]?.title || 'Unknown'}</p>
+                              </div>
                             </div>
                             <div className="ml-2 flex-shrink-0 flex">
                               <p className={`inline-flex px-2 text-xs leading-5 font-semibold rounded-full bg-${color}-100 text-${color}-800`}>

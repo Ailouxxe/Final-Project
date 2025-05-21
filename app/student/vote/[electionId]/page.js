@@ -38,7 +38,7 @@ export default function Vote({ params }) {
         
         if (!votesSnapshot.empty) {
           setHasVoted(true);
-          router.push('/student');
+          router.push(`/admin/results?electionId=${electionId}`);
           return;
         }
         

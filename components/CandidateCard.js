@@ -5,17 +5,29 @@ export default function CandidateCard({ candidate, isSelected, onClick, selectab
 
   return (
     <div 
-      className={`bg-white rounded-lg shadow-md overflow-hidden ${
+      className={`bg-white rounded-xl shadow-md overflow-hidden ${
         selectable ? 'cursor-pointer transition-all duration-300 hover:shadow-lg' : ''
       } ${isSelected ? 'ring-2 ring-blue-500 transform scale-[1.02]' : ''}`}
       onClick={selectable ? onClick : undefined}
     >
-      <div className="p-6">
-        <div className="flex items-center justify-center mb-4">
-          <div className="h-20 w-20 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-2xl font-bold">
-            {candidate.fullName.charAt(0)}
+      {/* Main candidate image */}
+      <div className="w-full h-48 bg-gray-100 relative">
+        {candidate.mainImageUrl ? (
+          <img 
+            src={candidate.mainImageUrl} 
+            alt={candidate.fullName}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-r from-blue-100 to-blue-200">
+            <div className="h-24 w-24 rounded-full bg-white flex items-center justify-center text-blue-700 text-4xl font-bold shadow-sm">
+              {candidate.fullName.charAt(0)}
+            </div>
           </div>
-        </div>
+        )}
+      </div>
+      
+      <div className="p-6">
         <h3 className="text-xl font-bold text-center text-gray-900 mb-2">{candidate.fullName}</h3>
         <p className="text-gray-600 text-center mb-4">{candidate.department}</p>
         
@@ -23,9 +35,20 @@ export default function CandidateCard({ candidate, isSelected, onClick, selectab
           <p className="text-blue-600 text-center font-medium mb-4">Running for: {candidate.position}</p>
         )}
         
+        {/* Secondary image (campaign banner) */}
+        {candidate.secondaryImageUrl && (
+          <div className="mb-4 rounded-lg overflow-hidden border border-gray-200">
+            <img 
+              src={candidate.secondaryImageUrl} 
+              alt="Campaign banner"
+              className="w-full h-32 object-cover"
+            />
+          </div>
+        )}
+        
         <div className="mb-4">
           <h4 className="text-sm font-medium text-gray-700 mb-2">Manifesto:</h4>
-          <p className="text-gray-600 text-sm line-clamp-4">{candidate.manifesto}</p>
+          <p className="text-gray-600 text-sm">{candidate.manifesto}</p>
         </div>
         
         {isAdminView ? (
