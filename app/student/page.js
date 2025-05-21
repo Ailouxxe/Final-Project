@@ -22,31 +22,40 @@ export default function StudentDashboard() {
       
       try {
         setLoading(true);
-        const now = new Date().toISOString();
-        const electionsQuery = query(
-          collection(db, 'elections'),
-          where('startDate', '<=', now),
-          where('endDate', '>=', now),
-          orderBy('startDate', 'desc')
+        
+        // Simple approach to avoid composite index requirements
+        const allElectionsQuery = query(
+          collection(db, 'elections')
         );
         
-        const querySnapshot = await getDocs(electionsQuery);
+        const querySnapshot = await getDocs(allElectionsQuery);
+        const now = new Date();
         const electionsData = [];
         
+        // Filter for active elections manually
         for (const doc of querySnapshot.docs) {
-          const electionData = { id: doc.id, ...doc.data() };
+          const data = doc.data();
+          const startDate = new Date(data.startDate);
+          const endDate = new Date(data.endDate);
           
-          // Check if the student has already voted in this election
-          const votesQuery = query(
-            collection(db, 'votes'),
-            where('electionId', '==', doc.id),
-            where('studentId', '==', user.uid)
-          );
-          const votesSnapshot = await getDocs(votesQuery);
-          electionData.hasVoted = !votesSnapshot.empty;
-          
-          electionsData.push(electionData);
+          if (startDate <= now && endDate >= now) {
+            const electionData = { id: doc.id, ...data };
+            
+            // Check if the student has already voted in this election
+            const votesQuery = query(
+              collection(db, 'votes'),
+              where('electionId', '==', doc.id),
+              where('studentId', '==', user.uid)
+            );
+            const votesSnapshot = await getDocs(votesQuery);
+            electionData.hasVoted = !votesSnapshot.empty;
+            
+            electionsData.push(electionData);
+          }
         }
+        
+        // Sort elections by start date, newest first
+        electionsData.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
         
         setElections(electionsData);
       } catch (err) {
