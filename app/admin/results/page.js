@@ -322,10 +322,7 @@ function ResultsPageContent() {
             
             {/* Recent voter activity */}
             <div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">Voter Activity</h2>
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <VoterFeed electionId={electionId} limit={10} />
-              </div>
+
             </div>
           </div>
         </div>

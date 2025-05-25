@@ -154,7 +154,7 @@ export default function StudentDashboard() {
                       className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-100 cursor-pointer h-full"
                       onClick={() => {
                         if (election.hasVoted) {
-                          router.push(`/admin/results?electionId=${election.id}`);
+                          router.push(`/student/results?electionId=${election.id}`);
                         } else {
                           router.push(`/student/vote/${election.id}`);
                         }
