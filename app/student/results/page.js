@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
@@ -8,7 +8,7 @@ import ProtectedRoute from '../../../components/ProtectedRoute';
 import ResultsChart from '../../../components/ResultsChart';
 import Link from 'next/link';
 
-export default function ResultsPage() {
+function ResultsPage() {
   const searchParams = useSearchParams();
   const electionId = searchParams.get('electionId');
   const [election, setElection] = useState(null);
@@ -127,5 +127,15 @@ export default function ResultsPage() {
         </div>
       </div>
     </ProtectedRoute>
+  );
+}
+
+export default function Page() {
+  return (
+    <div>
+      <Suspense fallback={<div>Loading results...</div>}>
+        <ResultsPage />
+      </Suspense>
+    </div>
   );
 }
