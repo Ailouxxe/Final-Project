@@ -1,14 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { doc, getDoc, collection, getDocs, where, query, addDoc, Timestamp } from 'firebase/firestore';
 import { db } from '../../../../lib/firebase';
 import { useAuth } from '../../../../context/AuthContext';
 import ProtectedRoute from '../../../../components/ProtectedRoute';
 import CandidateCard from '../../../../components/CandidateCard';
 
-export default function Vote({ params }) {
+export default function Vote() {
+  const params = useParams();
   const { electionId } = params;
   const [election, setElection] = useState(null);
   const [candidates, setCandidates] = useState([]);

@@ -7,16 +7,19 @@ import { db } from '../../lib/firebase';
 import { useAuth } from '../../context/AuthContext';
 import ProtectedRoute from '../../components/ProtectedRoute';
 import VoterFeed from '../../components/VoterFeed';
+import Link from 'next/link';
 
 export default function StudentDashboard() {
   const [elections, setElections] = useState([]);
+  const [upcomingElections, setUpcomingElections] = useState([]);
+  const [pastElections, setPastElections] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const { user } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    const fetchActiveElections = async () => {
+    const fetchElections = async () => {
       if (!user) return;
 
       try {
@@ -25,14 +28,17 @@ export default function StudentDashboard() {
         const querySnapshot = await getDocs(allElectionsQuery);
         const now = new Date();
         const electionsData = [];
+        const upcomingData = [];
+        const pastData = [];
 
         for (const doc of querySnapshot.docs) {
           const data = doc.data();
           const startDate = new Date(data.startDate);
           const endDate = new Date(data.endDate);
 
+          const electionData = { id: doc.id, ...data };
+
           if (startDate <= now && endDate >= now) {
-            const electionData = { id: doc.id, ...data };
             const votesQuery = query(
               collection(db, 'votes'),
               where('electionId', '==', doc.id),
@@ -41,11 +47,20 @@ export default function StudentDashboard() {
             const votesSnapshot = await getDocs(votesQuery);
             electionData.hasVoted = !votesSnapshot.empty;
             electionsData.push(electionData);
+          } else if (startDate > now) {
+            upcomingData.push(electionData);
+          } else if (endDate < now) {
+            pastData.push(electionData);
           }
         }
 
         electionsData.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+        upcomingData.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+        pastData.sort((a, b) => new Date(b.endDate) - new Date(a.endDate));
+
         setElections(electionsData);
+        setUpcomingElections(upcomingData);
+        setPastElections(pastData);
       } catch (err) {
         console.error('Error fetching elections:', err);
         setError('Failed to load elections. Please try again later.');
@@ -54,7 +69,7 @@ export default function StudentDashboard() {
       }
     };
 
-    fetchActiveElections();
+    fetchElections();
   }, [user]);
 
   return (
@@ -147,11 +162,11 @@ export default function StudentDashboard() {
                   <p className="text-gray-500 text-sm mt-1">Check back soon for new elections.</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {elections.map((election) => (
                     <div
                       key={election.id}
-                      className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-100 cursor-pointer h-full"
+                      className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-100 h-full w-full"
                       onClick={() => {
                         if (election.hasVoted) {
                           router.push(`/student/results?electionId=${election.id}`);
@@ -178,7 +193,7 @@ export default function StudentDashboard() {
                           <div className="text-sm text-gray-500">
                             <span className="font-medium">Ends:</span> {new Date(election.endDate).toLocaleDateString()}
                           </div>
-                          <div className={`inline-flex items-center px-3 py-1 rounded-md text-sm font-medium ${
+                          <div className={`inline-flex items-center px-3 py-1 rounded-md text-sm font-medium cursor-pointer ${
                             election.hasVoted 
                               ? 'text-purple-700 bg-purple-50' 
                               : 'text-green-700 bg-green-50'
@@ -195,6 +210,111 @@ export default function StudentDashboard() {
                 </div>
               )}
             </div>
+
+            
+           {/* Upcoming Elections */}
+            <div className="mt-12">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-800 flex items-center">
+                  <span className="bg-yellow-100 p-2 rounded-lg mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-yellow-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </span>
+                  Upcoming Elections
+                </h2>
+              </div>
+              {upcomingElections.length === 0 ? (
+                <div className="bg-white p-8 rounded-xl shadow-md text-center border border-gray-100">
+                  <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <p className="text-gray-600 font-medium">No upcoming elections scheduled.</p>
+                  <p className="text-gray-500 text-sm mt-1">Plan your next election in advance.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {upcomingElections.map((election) => (
+                    <div key={election.id} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-100 h-full">
+                      <div className="h-2 bg-yellow-500"></div>
+                      <div className="p-6">
+                        <div className="flex justify-between items-start">
+                          <h3 className="text-xl font-semibold text-gray-800 mb-2">{election.title}</h3>
+                          <span className="px-3 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800 flex items-center">
+                            <span className="w-2 h-2 bg-yellow-500 rounded-full mr-1"></span>
+                            Upcoming
+                          </span>
+                        </div>
+                        <p className="text-gray-600 mb-4 line-clamp-2">{election.description}</p>
+                        <div className="flex justify-between text-sm text-gray-500 pt-3 border-t border-gray-100">
+                          <div>
+                            <span className="font-medium text-gray-600">Starts:</span> {new Date(election.startDate).toLocaleDateString()}
+                          </div>
+                          <div>
+                            <span className="font-medium text-gray-600">Ends:</span> {new Date(election.endDate).toLocaleDateString()}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Past Elections */}
+            <div className="mt-12">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-800 flex items-center">
+                  <span className="bg-gray-100 p-2 rounded-lg mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                  </span>
+                  Past Elections
+                </h2>
+              </div>
+              {pastElections.length === 0 ? (
+                <div className="bg-white p-8 rounded-xl shadow-md text-center border border-gray-100">
+                  <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                    </svg>
+                  </div>
+                  <p className="text-gray-600 font-medium">No past elections found.</p>
+                  <p className="text-gray-500 text-sm mt-1">Completed elections will appear here.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {pastElections.map((election) => (
+                    <div key={election.id} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-100 h-full">
+                      <div className="h-2 bg-gray-500"></div>
+                      <div className="p-6">
+                        <div className="flex justify-between items-start">
+                          <h3 className="text-xl font-semibold text-gray-800 mb-2">{election.title}</h3>
+                          <span className="px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800 flex items-center">
+                            <span className="w-2 h-2 bg-gray-500 rounded-full mr-1"></span>
+                            Completed
+                          </span>
+                        </div>
+                        <p className="text-gray-600 mb-4 line-clamp-2">{election.description}</p>
+                        <div className="flex justify-between text-sm text-gray-500 pt-3 border-t border-gray-100">
+                          <div>
+                            <span className="font-medium text-gray-600">Ended:</span> {new Date(election.endDate).toLocaleDateString()}
+                          </div>
+                        </div>
+                        <Link href={`/student/results?electionId=${election.id}`} className="text-blue-600 hover:underline mt-4 block">
+                          View Results
+                        </Link>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+   
 
             {/* Voter Feed */}
             <div className="mt-12">
